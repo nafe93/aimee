@@ -1,0 +1,120 @@
+### PHP-FPM Container #######################################
+
+php-fpm:
+  image: notaleks/aimee:php-fpm
+  links:
+    - application
+  volumes_from:
+    - application
+  ports:
+    - '9000'
+
+### Laravel Application Code Container ######################
+
+application:
+  command: bash -c "composer install
+                &&  cp .env.example .env
+                &&  sed -i 's/APP_ENV=development/APP_ENV=production/g' .env
+                &&  sed -i 's/APP_URL=http:\/\/localhost/APP_URL=https:\/\/www.getaimee.com/g' .env
+                &&  sed -i 's/APP_DEBUG=true/APP_DEBUG=false/g' .env
+                &&  sed -i 's/DB_PASSWORD=secret/DB_PASSWORD=TB2jgsM/g' .env
+                &&  sed -i 's/MAIL_HOST=/MAIL_HOST=smtp.postmarkapp.com/g' .env
+                &&  sed -i 's/POSTMARK_API_TOKEN==/POSTMARK_API_TOKEN=347099b2-c201-495e-9ae7-0570d3f5df31/g' .env
+                &&  sed -i 's/MAIL_FROM_ADDRESS=/MAIL_FROM_ADDRESS=info@getaimee.com/g' .env
+                &&  sed -i 's/MAIL_FROM_NAME=/MAIL_FROM_NAME=Aimee/g' .env
+                &&  sed -i 's/POSTMARK_API_TOKEN=/POSTMARK_API_TOKEN=d4ad1522-fead-4427-8847-142583d338d3/g' .env
+                &&  sed -i 's/AUTHY_SECRET=/AUTHY_SECRET=AC4da2f210b7b568050ae619f2e6a11c5f/g' .env
+                &&  sed -i 's/STRIPE_KEY=null/STRIPE_KEY=pk_test_TB2jgsMbEStuxzHd0mmk00z9/g' .env
+                &&  sed -i 's/STRIPE_SECRET=null/STRIPE_SECRET=sk_test_k6kYcsGbKrFY1VqJJunweUCw/g' .env
+                &&  sed -i 's/FACEBOOK_CALLBACK_URL=http:\/\/localhost\/auth\/facebook\/callback/FACEBOOK_CALLBACK_URL=https:\/\/www.getaimee.com\/auth\/facebook/g' .env
+                &&  sed -i 's/LINKEDIN_CALLBACK_URL=http:\/\/127.0.0.1\/auth\/linkedin\/callback/LINKEDIN_CALLBACK_URL=https:\/\/www.getaimee.com\/auth\/linkedin/g' .env
+                &&  sed -i 's/GITHUB_CLIENT_ID=1e6b5834742bb32a2a31/GITHUB_CLIENT_ID=5c3efcfb951bfba263cf/g' .env
+                &&  sed -i 's/GITHUB_CLIENT_SECRET=8d049e53480516b07313315ec58524ba8c3c1cc6/GITHUB_CLIENT_SECRET=6f643a5bbe38fa541708ea88c436161ace695377/g' .env
+                &&  sed -i 's/GITHUB_CALLBACK_URL=http:\/\/127.0.0.1\/auth\/github\/callback/GITHUB_CALLBACK_URL=https:\/\/www.getaimee.com\/auth\/github/g' .env
+                &&  sed -i 's/TWITTER_API_KEY=Nl2r1gflf5jmr28UNLJwvWRxr/TWITTER_API_KEY=DqItE49MNFiToqKnnokbHn1gk/g' .env
+                &&  sed -i 's/TWITTER_APP_SECRET=zoUQlduK8kSJk64WOfxiOoOJCtRdtz3AQGaV10iZe0NCgogyZ1/TWITTER_APP_SECRET=7av1Kb2z6ZZ7rNJrcAufFveuGCtPJDRNgYH7Jvj43BYqcd7b6X/g' .env
+                &&  sed -i 's/TWITTER_CALLBACK_URL=http:\/\/127.0.0.1\/auth\/twitter\/callback/TWITTER_CALLBACK_URL=https:\/\/www.getaimee.com\/auth\/twitter/g' .env
+                &&  sed -i 's/GOOGLE_CALLBACK_URL=http:\/\/localhost\/auth\/google\/callback/GOOGLE_CALLBACK_URL=https:\/\/www.getaimee.com\/auth\/google/g' .env
+                &&  sed -i 's/INSTAGRAM_CALLBACK_URL=http:\/\/127.0.0.1\/auth\/instagram\/callback/INSTAGRAM_CALLBACK_URL=https:\/\/www.getaimee.com\/auth\/instagram/g' .env
+                &&  sed -i 's/LASTFM_API_KEY=5ab2e2dd62d2ede1520ac6fe68c8330c/LASTFM_API_KEY=0e65a947e0a7cec9f7518357e8072793/g' .env
+                &&  sed -i 's/LASTFM_API_SECRET=c4c01b62ba4bc7e21c667fe17b6324ab/LASTFM_API_SECRET=c52de96d48712a96a81bb087a821d4d6/g' .env
+                &&  sed -i 's/LASTFM_CALLBACK_URL=http:\/\/127.0.0.1\/auth\/lastfm\/callback/LASTFM_CALLBACK_URL=https:\/\/www.getaimee.com\/auth\/lastfm/g' .env
+                &&  sed -i 's/FOURSQUARE_CALLBACK_URL=http:\/\/127.0.0.1\/auth\/foursquare\/callback/FOURSQUARE_CALLBACK_URL=https:\/\/www.getaimee.com\/auth\/foursquare/g' .env
+                &&  sed -i 's/TUMBLR_API_KEY=7tm0T4KTGqbWVrXRm6hzsVoO49MMj1NdoLndl2IkYfUeDCOopq/TUMBLR_API_KEY=Ud0Oh1EYhHGx2YwJy5b3LeJI00A8D3tpKkONVWiAphkWFouji7/g' .env
+                &&  sed -i 's/TUMBLR_SECRET=wPwMaIyRyZmGGJOOSrvxuPKetE00RV4pkgNdP6NV06XOTN6uMg/TUMBLR_SECRET=ml9ucd4amF1sYwhE41aLEgCCsWvNgYikjxsbot4bFUT0MRjlzb/g' .env
+                &&  sed -i 's/TUMBLR_REDIRECT_URI=http:\/\/127.0.0.1\/auth\/tumblr\/callback/TUMBLR_REDIRECT_URI=https:\/\/www.getaimee.com\/auth\/tumblr\/callback/g' .env
+                &&  php artisan config:clear
+                &&  php artisan key:generate --no-interaction
+                &&  php artisan config:cache
+                &&  php artisan optimize
+                &&  php artisan migrate --no-interaction
+                &&  mkdir public/storage
+                &&  ln -s /var/www/getaimee.com/storage/app/public/profiles /var/www/getaimee.com/public/storage
+                &&  chmod -R 777 storage bootstrap/cache"
+  image: notaleks/aimee:application
+  volumes:
+    - /var/www/getaimee.com
+
+### Databases Data Container ################################
+
+data:
+  image: notaleks/aimee:data
+  volumes:
+    - /var/lib/mysql:/var/lib/mysql
+    - /var/lib/postgres:/var/lib/postgres
+    - /var/lib/mariadb:/var/lib/mariadb
+    - /var/lib/memcached:/var/lib/memcached
+    - /var/lib/redis:/data
+    - /var/lib/neo4j:/var/lib/neo4j/data
+    - /var/lib/mongo:/data/db
+
+### Nginx Server Container ##################################
+
+nginx:
+  command: bash -c "echo 'deb http://ftp.debian.org/debian jessie-backports main' >> /etc/apt/sources.list
+               &&  apt-get update
+               &&  apt-get install -y certbot -t jessie-backports
+               &&  mkdir -p /var/www/letsencrypt/.well-known/acme-challenge
+               &&  nginx -g 'daemon on;'
+               &&  certbot certonly --webroot -w /var/www/letsencrypt -d www.getaimee.com --email info@getaimee.com --text --non-interactive --agree-tos --test-cert
+               &&  echo 'ssl_certificate /etc/letsencrypt/live/www.getaimee.com/fullchain.pem;' >> /etc/nginx/ssl.conf
+               &&  echo 'ssl_certificate_key /etc/letsencrypt/live/www.getaimee.com/privkey.pem;' >> /etc/nginx/ssl.conf
+               &&  echo 'ssl_trusted_certificate /etc/letsencrypt/live/www.getaimee.com/fullchain.pem;' >> /etc/nginx/ssl.conf
+               &&  pkill -QUIT nginx
+               &&  nginx -g 'daemon off;'"
+  image: notaleks/aimee:nginx
+  volumes_from:
+    - application
+  ports:
+    - '80:80'
+    - '443:443'
+  links:
+    - php-fpm
+
+### MySQL Container #########################################
+
+mysql:
+  image: notaleks/aimee:mysql
+  volumes_from:
+    - data
+  ports:
+    - '3306:3306'
+  environment:
+    MYSQL_DATABASE: aimee
+    MYSQL_USER: aimee
+    MYSQL_PASSWORD: TB2jgsM
+    MYSQL_ROOT_PASSWORD: TB2jgsM
+
+### Add more Containers below ###############################
+
+backup:
+  image: tutum/mysql-backup
+  volumes:
+    - /var/lib/mysql:/backup
+  links:
+    - mysql
+  environment:
+    MYSQL_HOST: mysql
+    MYSQL_PORT: 3306
+    MYSQL_USER: aimee
+    MYSQL_PASS: TB2jgsM

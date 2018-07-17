@@ -1,0 +1,12 @@
+version: '2'
+services:
+  web:
+    image: dockercloud/hello-world
+  lb:
+    image: dockercloud/haproxy
+    links:
+      - web
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - 80:80
